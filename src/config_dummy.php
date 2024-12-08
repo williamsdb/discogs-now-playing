@@ -1,6 +1,7 @@
 <?php
 
-$token = "";
-$username = "";
+    $token = "";
+    $username = "";
+    $endpoint = "https://api.discogs.com/";
 
 ?>

@@ -1,48 +1,18 @@
 <?php
 
-// set error handling
-error_reporting(E_NOTICE);
-ini_set('display_errors', 0);
+    // set error handling
+    error_reporting(E_NOTICE);
+    ini_set('display_errors', 0);
 
-try {
-    require __DIR__.'/config.php';
-} catch (\Throwable $th) {
-    die('config.php file not found. Have you renamed from config_dummy.php?');
-}
+    // have we got a config file?
+    try {
+        require __DIR__.'/config.php';
+    } catch (\Throwable $th) {
+        die('config.php file not found. Have you renamed from config_dummy.php?');
+    }
 
-$endpoint = "https://api.discogs.com/";
-
-// get the user details
-$ch = curl_init($endpoint."/users/{$username}");
-curl_setopt($ch, CURLOPT_USERAGENT, 'MyDiscogsClient/1.0 +https://nei.lt');
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET' );
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Authorization: Discogs token={$token}"
-]);
-
-$response = curl_exec($ch);
-curl_close($ch);
-
-$dets = json_decode($response);
-
-// find the number of items in the collection
-$num = $dets->num_collection;
-
-
-$desc = [];
-
-while (!(in_array("LP", $desc) || in_array("12\"", $desc))) {
-    // select a random item
-    $rand = rand(1, $num);
-
-    // work out what page it is on
-    $page = intval($rand/10);
-
-    // what's the number on the page
-    $item = $rand - ($page*10);
-
-    $ch = curl_init($endpoint."/users/{$username}/collection/folders/0/releases?page=".$page."&per_page=10");
+    // get the user details
+    $ch = curl_init($endpoint."/users/{$username}");
     curl_setopt($ch, CURLOPT_USERAGENT, 'MyDiscogsClient/1.0 +https://nei.lt');
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET' );
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -54,25 +24,61 @@ while (!(in_array("LP", $desc) || in_array("12\"", $desc))) {
     curl_close($ch);
 
     $dets = json_decode($response);
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-    $release = $dets->releases[$item];
 
-    $ch = curl_init($release->basic_information->master_url);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'MyDiscogsClient/1.0 +https://nei.lt');
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET' );
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "Authorization: Discogs token={$token}"
-    ]);
+    // find the number of items in the collection
+    $num = $dets->num_collection;
 
-    $response = curl_exec($ch);
-    curl_close($ch);
+    $desc = [];
 
-    $res = json_decode($response);
+    // loop round until we get an entry of the type either LP or 12"
+    while (!(in_array("LP", $desc) || in_array("12\"", $desc))) {
 
-    $desc = $release->basic_information->formats[0]->descriptions;
-}
+        // select a random item
+        $rand = rand(1, $num);
+
+        // work out what page it is on
+        $page = intval($rand/10);
+
+        // what's the number on the page
+        $item = $rand - ($page*10);
+
+        // get the page with the random entry on
+        $ch = curl_init($endpoint."/users/{$username}/collection/folders/0/releases?page=".$page."&per_page=10");
+        curl_setopt($ch, CURLOPT_USERAGENT, 'MyDiscogsClient/1.0 +https://nei.lt/now-playing');
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET' );
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Authorization: Discogs token={$token}"
+        ]);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $dets = json_decode($response);
+
+        $release = $dets->releases[$item];
+
+        if (isset($release->basic_information->formats[0]->descriptions)){
+            $desc = $release->basic_information->formats[0]->descriptions;
+
+            // get the master release information
+            $ch = curl_init($release->basic_information->master_url);
+            curl_setopt($ch, CURLOPT_USERAGENT, 'MyDiscogsClient/1.0 +https://nei.lt/now-playing');
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET' );
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                "Authorization: Discogs token={$token}"
+            ]);
+
+            $response = curl_exec($ch);
+            curl_close($ch);
+
+            $master = json_decode($response);
+        }else{
+            $desc = [];
+        }
+
+    }
 ?>
 
 <!DOCTYPE html>
@@ -150,7 +156,7 @@ while (!(in_array("LP", $desc) || in_array("12\"", $desc))) {
 </head>
 <body>
     <div class="above-text"><h1>Go Play</h1></div>
-    <div class="now-playing" onclick="openInNewTab('<?php echo $res->uri; ?>')">
+    <div class="now-playing" onclick="openInNewTab('<?php echo $master->uri; ?>')">
         <img src="<?php echo $release->basic_information->cover_image ?>" alt="Cover Art" class="cover-art">
         <div class="song-title"><?php echo $release->basic_information->title ?></div>
         <div class="artist"><?php echo $release->basic_information->artists[0]->name ?></div>
