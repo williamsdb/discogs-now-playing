@@ -46,7 +46,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-I've got a lot of records (At the time of writing 1,076 Discogs tells me) and I always seems to gravitate to the same ones. I decided I needed help to selecting something to play so I wrote Now Playing to help guide me.
+I've got a lot of records (At the time of writing 1,076 Discogs tells me) and I always seem to gravitate to the same ones. I decided I needed help to selecting something to play so I wrote Now Playing to help guide me.
 
 <a href='https://ko-fi.com/Y8Y0POEES' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 

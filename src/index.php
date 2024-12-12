@@ -73,6 +73,21 @@
             $response = curl_exec($ch);
             curl_close($ch);
 
+            // download and cache the image
+            $imgUrl = $release->basic_information->cover_image;
+
+            // Remove query parameters if needed
+            $parsed_url = parse_url($imgUrl, PHP_URL_PATH);
+            $img = basename($parsed_url);
+
+            // check to see if the image file is already cached
+            if (file_exists('./cache/'.$img)){
+                // do nothing
+            }else{
+                $image = file_get_contents($imgUrl);
+                file_put_contents('./cache/'.$img, $image);
+            }
+
             $master = json_decode($response);
         }else{
             $desc = [];
@@ -157,7 +172,7 @@
 <body>
     <div class="above-text"><h1>Go Play</h1></div>
     <div class="now-playing" onclick="openInNewTab('<?php echo $master->uri; ?>')">
-        <img src="<?php echo $release->basic_information->cover_image ?>" alt="Cover Art" class="cover-art">
+        <img src="<?php echo './cache/'.$img; ?>" alt="Cover Art" class="cover-art">
         <div class="song-title"><?php echo $release->basic_information->title ?></div>
         <div class="artist"><?php echo $release->basic_information->artists[0]->name ?></div>
         <div class="release-year">Released: <?php echo $release->basic_information->year ?></div>
