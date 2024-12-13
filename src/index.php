@@ -178,7 +178,7 @@
         <div class="release-year">Released: <?php echo $release->basic_information->year ?></div>
     </div>
     <div class="below-text">
-        <p><a class="refresh" href="#" id="reloadLink" aria-haspopup="true" aria-expanded="false">Refresh</a></p>
+        <p><a class="refresh" href="#" id="reloadLink" aria-haspopup="true" aria-expanded="false">Next selection</a></p>
         <small>Built by <a href="https://neilthompson.me">Neil Thompson</a>.</small></div>
 
     <script>
