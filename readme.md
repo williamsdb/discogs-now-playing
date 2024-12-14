@@ -5,10 +5,10 @@
 <br />
 <div align="center">
 
-<h3 align="center">Now Playing</h3>
+<h3 align="center">What should I play next?</h3>
 
   <p align="center">
-    Display a random item from your Discogs collection to play
+    Display a random item from your Discogs collection to play.
     <br />
   </p>
 </div>
@@ -46,7 +46,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-I've got a lot of records (At the time of writing 1,076 Discogs tells me) and I always seem to gravitate to the same ones. I decided I needed help to selecting something to play so I wrote Now Playing to help guide me.
+I've got a lot of records (At the time of writing 1,076 Discogs tells me) and I always seem to gravitate to the same ones. Therefore, I decided I needed help selecting something to play so I wrote Now Playing to help guide me.
 
 <a href='https://ko-fi.com/Y8Y0POEES' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
@@ -72,7 +72,7 @@ Running the script is very straightforward:
 
 1. download the code/clone the repository
 
-You can read more about how this all works in [this blog post](tbd).
+You can read more about how this all works in [this blog post](https://www.spokenlikeageek.com/2024/12/16/what-should-i-play-next/).
 
 ### Prerequisites
 
@@ -87,7 +87,10 @@ Requirements are very simple, it requires the following:
    ```sh
    git clone https://github.com/williamsdb/now-playing.git
    ```
-2. rename config_dummy.php to config.php and changes the settings in it.
+2. rename config_dummy.php to config.php and changes the settings in it
+3. create a folder called cache and give the web process access to it. For Red Hat variants this is:
+```sudo mkdir cache```
+```sudo chown apache:apache cache```.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -96,7 +99,13 @@ Requirements are very simple, it requires the following:
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-_For more information, please refer to the [this blog post](tbd)_
+By default the code only selects LPs and 12" singles to display as that is what I am interested in playing. If you want to include other types just extend out line 34. For example to include CDs:
+
+```while (!(in_array("CD", $desc) || in_array("LP", $desc) || in_array("12\"", $desc))) {```
+
+And if you want it to return anything irrespective of type simply comment out the while statement and closing curly brace.
+
+_For more information, please refer to the [this blog post](https://www.spokenlikeageek.com/2024/12/16/what-should-i-play-next/)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -157,10 +166,16 @@ Project link - [Github](https://github.com/williamsdb/now-playing)
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* [BlueskyApi](https://github.com/cjrasmussen/BlueskyApi)
+* None.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+[![](https://github.com/williamsdb/now-playing/graphs/contributors)](https://img.shields.io/github/contributors/williamsdb/now-playing.svg?style=for-the-badge)
+
+![](https://img.shields.io/github/contributors/williamsdb/now-playing.svg?style=for-the-badge)
+![](https://img.shields.io/github/forks/williamsdb/now-playing.svg?style=for-the-badge)
+![](https://img.shields.io/github/stars/williamsdb/now-playing.svg?style=for-the-badge)
+![](https://img.shields.io/github/issues/williamsdb/now-playing.svg?style=for-the-badge)
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
