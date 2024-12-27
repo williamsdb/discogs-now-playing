@@ -84,8 +84,11 @@
             if (file_exists('./cache/'.$img)){
                 // do nothing
             }else{
-                $image = file_get_contents($imgUrl);
-                file_put_contents('./cache/'.$img, $image);
+                if ($image = file_get_contents($imgUrl)){
+                    file_put_contents('./cache/'.$img, $image);
+                }else{
+                    $img = 'nocoverart.jpeg';
+                }
             }
 
             $master = json_decode($response);
