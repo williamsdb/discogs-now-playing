@@ -80,14 +80,19 @@
             $parsed_url = parse_url($imgUrl, PHP_URL_PATH);
             $img = basename($parsed_url);
 
-            // check to see if the image file is already cached
-            if (file_exists('./cache/'.$img)){
-                // do nothing
+            // have we got an image?
+            if (empty($img)){
+                $img = 'nocoverart.jpeg';
             }else{
-                if ($image = file_get_contents($imgUrl)){
-                    file_put_contents('./cache/'.$img, $image);
+                // check to see if the image file is already cached
+                if (file_exists('./cache/'.$img)){
+                    // do nothing
                 }else{
-                    $img = 'nocoverart.jpeg';
+                    if ($image = file_get_contents($imgUrl)){
+                        file_put_contents('./cache/'.$img, $image);
+                    }else{
+                        $img = 'nocoverart.jpeg';
+                    }
                 }
             }
 
