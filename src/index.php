@@ -73,30 +73,37 @@
             $response = curl_exec($ch);
             curl_close($ch);
 
-            // download and cache the image
-            $imgUrl = $release->basic_information->cover_image;
+            $master = json_decode($response);
 
+            // download and cache the image
+            $masterUrl = $master->uri;
+            $parsedMasterUrl = parse_url($masterUrl, PHP_URL_PATH);
+            $masterStub = basename($parsedMasterUrl);
+
+            $imgUrl = $release->basic_information->cover_image;
             // Remove query parameters if needed
-            $parsed_url = parse_url($imgUrl, PHP_URL_PATH);
-            $img = basename($parsed_url);
+            $parsedUrl = parse_url($imgUrl, PHP_URL_PATH);
+            $img = basename($parsedUrl);
 
             // have we got an image?
             if (empty($img)){
                 $img = 'nocoverart.jpeg';
             }else{
                 // check to see if the image file is already cached
-                if (file_exists('./cache/'.$img)){
+                if (file_exists('./cache/'.$masterStub.'-'.$img)){
                     // do nothing
                 }else{
                     if ($image = file_get_contents($imgUrl)){
-                        file_put_contents('./cache/'.$img, $image);
+                        try {
+                            file_put_contents('./cache/'.$masterStub.'-'.$img, $image);
+                        } catch (\Throwable $th) {
+                            //throw $th;
+                        }
                     }else{
                         $img = 'nocoverart.jpeg';
                     }
                 }
             }
-
-            $master = json_decode($response);
         }else{
             $desc = [];
         }
@@ -182,7 +189,7 @@
 <body>
     <div class="above-text"><h1>Go Play</h1></div>
     <div class="now-playing" onclick="openInNewTab('<?php echo $master->uri; ?>')">
-        <img src="<?php echo './cache/'.$img; ?>" alt="Cover Art" class="cover-art">
+        <img src="<?php echo './cache/'.$masterStub.'-'.$img; ?>" alt="Cover Art" class="cover-art">
         <div class="song-title"><?php echo $release->basic_information->title ?></div>
         <div class="artist"><?php echo $release->basic_information->artists[0]->name ?></div>
         <div class="release-year">Released: <?php echo $release->basic_information->year ?></div>

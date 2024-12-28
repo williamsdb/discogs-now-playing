@@ -89,11 +89,12 @@ Requirements are very simple, it requires the following:
    ```
 2. rename config_dummy.php to config.php and changes the settings in it
 3. create a folder called cache and give the web process access to it. For Red Hat variants this is:
+
 ```sudo mkdir cache```
 
 ```sudo chown apache:apache cache```
 
-```sudo mv nocoverart.jpeg cache```.
+```sudo cp nocoverart.jpeg cache```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
