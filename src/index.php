@@ -1,5 +1,8 @@
 <?php
 
+
+    class nowPlayingException extends Exception {}
+
     // set error handling
     error_reporting(E_NOTICE);
     ini_set('display_errors', 0);
@@ -8,7 +11,7 @@
     try {
         require __DIR__.'/config.php';
     } catch (\Throwable $th) {
-        die('config.php file not found. Have you renamed from config_dummy.php?');
+        throw new nowPlayingException("config.php file not found. Have you renamed from config_dummy.php?.");
     }
 
     // get the user details
@@ -115,13 +118,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimal-ui, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <!-- Favicon -->
 	<link rel="shortcut icon" type="image/png" href="favicon.png">
-	<link rel="apple-touch-icon" href="favicon.png">
+    <link rel="apple-touch-icon" sizes="57x57" href="/favicon-57x57.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/favicon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/favicon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/favicon-120x120.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/favicon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
 
     <title>Now Playing</title>
     <style>
