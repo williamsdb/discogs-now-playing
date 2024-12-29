@@ -168,7 +168,7 @@
             transform: translate(-50%, -50%);
             width: 30px;
             height: 30px;
-            border: 4px solid rgba(0, 0, 0, 0.1);
+            border: 4px solid rgba(255, 0, 0, 0.5);
             border-top: 4px solid #FFF;
             border-radius: 50%;
             animation: spin 1s linear infinite;
