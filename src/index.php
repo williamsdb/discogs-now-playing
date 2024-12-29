@@ -153,12 +153,27 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             width: 320px; 
             cursor: pointer;
+            position: relative;
         }
         .cover-art {
             width: 300px;
             height: 300px;
             border-radius: 10px;
             margin-bottom: 20px;
+        }
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #FFF;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none; /* Hidden by default */
+            z-index: 2; /* Ensure it appears above content */
         }
         .song-title {
             font-size: 24px;
@@ -192,11 +207,20 @@
             border-radius: 5px;
             font-weight: bold;
         }
+        @keyframes spin {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body>
     <div class="above-text"><h1>Go Play</h1></div>
     <div class="now-playing" onclick="openInNewTab('<?php echo $master->uri; ?>')">
+        <div class="loading-spinner"></div>
         <img src="<?php echo './cache/'.$masterStub.'-'.$img; ?>" alt="Cover Art" class="cover-art">
         <div class="song-title"><?php echo $release->basic_information->title ?></div>
         <div class="artist"><?php echo $release->basic_information->artists[0]->name ?></div>
@@ -211,10 +235,29 @@
             window.open(url, '_blank'); // Open URL in a new tab
         }
 
-        // Window reload event
-        document.getElementById('reloadLink').addEventListener('click', function(event) {
+        function showSpinner() {
+            const spinner = document.querySelector('.loading-spinner');
+            if (spinner) {
+                spinner.style.display = 'block'; // Show the spinner
+            }
+        }
+
+        function openInNewTab(url) {
+            showSpinner(); // Show the spinner
+            setTimeout(() => {
+                window.open(url, '_blank'); // Open the URL in a new tab after a slight delay
+                const spinner = document.querySelector('.loading-spinner');
+                if (spinner) spinner.style.display = 'none'; // Optionally hide the spinner
+            }, 100); // Add a small delay for spinner visibility
+        }
+
+        // Reload button event
+        document.getElementById('reloadLink').addEventListener('click', function (event) {
             event.preventDefault(); // Prevent the default behavior of the anchor tag
-            window.location.reload(); // Reload the page
+            showSpinner(); // Show the spinner
+            setTimeout(() => {
+                window.location.reload(); // Reload the page after a slight delay
+            }, 100);
         });
     </script>
 </body>
