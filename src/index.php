@@ -169,10 +169,10 @@
             width: 30px;
             height: 30px;
             border: 4px solid rgba(255, 0, 0, 0.5);
-            border-top: 4px solid #FFF;
+            border-top: 4px solid #fff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            display: none; /* Hidden by default */
+            visibility: hidden; /* Initially hidden */
             z-index: 2; /* Ensure it appears above content */
         }
         .song-title {
@@ -230,35 +230,47 @@
         <p><a class="refresh" href="#" id="reloadLink" aria-haspopup="true" aria-expanded="false">Next selection</a></p>
         <small>Built by <a href="https://neilthompson.me">Neil Thompson</a>.</small></div>
 
-    <script>
+        <script>
+        // Show the spinner
+        function showSpinner() {
+            const spinner = document.querySelector('.loading-spinner');
+            if (spinner) {
+                spinner.style.visibility = 'visible'; // Use visibility instead of display for compatibility
+            }
+        }
+
+        // Hide the spinner
+        function hideSpinner() {
+            const spinner = document.querySelector('.loading-spinner');
+            if (spinner) {
+                spinner.style.visibility = 'hidden';
+            }
+        }
+
+        // Open in a new tab
         function openInNewTab(url) {
             window.open(url, '_blank'); // Open URL in a new tab
         }
 
-        function showSpinner() {
-            const spinner = document.querySelector('.loading-spinner');
-            if (spinner) {
-                spinner.style.display = 'block'; // Show the spinner
-            }
-        }
-
-        function openInNewTab(url) {
-            showSpinner(); // Show the spinner
-            setTimeout(() => {
-                window.open(url, '_blank'); // Open the URL in a new tab after a slight delay
-                const spinner = document.querySelector('.loading-spinner');
-                if (spinner) spinner.style.display = 'none'; // Optionally hide the spinner
-            }, 100); // Add a small delay for spinner visibility
-        }
-
-        // Reload button event
+        // Reload the page
         document.getElementById('reloadLink').addEventListener('click', function (event) {
-            event.preventDefault(); // Prevent the default behavior of the anchor tag
-            showSpinner(); // Show the spinner
-            setTimeout(() => {
-                window.location.reload(); // Reload the page after a slight delay
+            event.preventDefault(); // Prevent default anchor behavior
+            showSpinner(); // Show spinner
+            setTimeout(function () {
+                window.location.reload(); // Reload the page
             }, 100);
         });
-    </script>
-</body>
+
+        // Polyfill for `Element.closest` for older browsers
+        if (!Element.prototype.closest) {
+            Element.prototype.closest = function (selector) {
+                var el = this;
+                while (el) {
+                    if (el.matches(selector)) return el;
+                    el = el.parentElement || el.parentNode;
+                }
+                return null;
+            };
+        }
+    </script></body>
 </html>
