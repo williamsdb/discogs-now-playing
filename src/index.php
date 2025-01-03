@@ -145,6 +145,9 @@
             margin: 0;
             text-align: center; /* Center-align text by default */
         }
+        a:visited, a:link {
+            color: #FFFFFF;
+        }
         .now-playing {
             text-align: center;
             background-color: #1DB954;
