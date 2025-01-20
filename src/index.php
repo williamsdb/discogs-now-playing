@@ -1,5 +1,19 @@
 <?php
 
+/**
+ * What should I play next?
+ * 
+ * Display a random item from your Discogs collection to play.
+ *
+ * @author  Neil Thompson <hi@nei.lt>
+ * @see     https://nei.lt/plexnp
+ * @license GNU Lesser General Public License, version 3
+ *
+ * I've got a lot of records (At the time of writing 1,076 Discogs tells me)
+ * and I always seem to gravitate to the same ones. Therefore, I decided I 
+ * needed help selecting something to play so I wrote Now Playing to help guide me.
+ * 
+ **/
 
     class nowPlayingException extends Exception {}
 
@@ -13,6 +27,41 @@
     } catch (\Throwable $th) {
         throw new nowPlayingException("config.php file not found. Have you renamed from config_dummy.php?.");
     }
+
+    // create and connect to the SQLite database to hold the cached data
+    try {
+        // Specify the path and filename for the SQLite database
+        $databasePath = './cache.sqlite';
+
+        if (!file_exists($databasePath)) {
+            // Create a new SQLite database or connect to an existing one
+            $pdo = new PDO('sqlite:' . $databasePath);
+        
+            // Set error mode to exceptions
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+            // Create the necessary tables if they don't already exist
+            $sql = "CREATE TABLE IF NOT EXISTS release (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        title TEXT NOT NULL,
+                        artist TEXT NOT NULL,
+                        year INTEGER,
+                        image TEXT,
+                        played INTEGER,
+                        lastPlayedAt DATETIME
+                    )";
+            $pdo->exec($sql);
+        }else{
+            // Connect to an existing database
+            $pdo = new PDO('sqlite:' . $databasePath);
+        
+            // Set error mode to exceptions
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        }
+    } catch (PDOException $e) {
+        die("Error: " . $e->getMessage());
+    }
+
 
     // get the user details
     $ch = curl_init($endpoint."/users/{$username}");
@@ -111,6 +160,34 @@
             $desc = [];
         }
 
+    }
+
+    // Check if the entry already exists in the database
+    $stmt = $pdo->prepare("SELECT id, played FROM release WHERE title = :title AND artist = :artist");
+    $stmt->execute([
+        ':title' => $release->basic_information->title,
+        ':artist' => $release->basic_information->artists[0]->name
+    ]);
+    $existingRelease = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($existingRelease) {
+        // Update the existing entry
+        $stmt = $pdo->prepare("UPDATE release SET played = played + 1, lastPlayedAt = :lastPlayedAt WHERE id = :id");
+        $stmt->execute([
+            ':lastPlayedAt' => date('Y-m-d H:i:s'),
+            ':id' => $existingRelease['id']
+        ]);
+    } else {
+        // Insert a new entry
+        $stmt = $pdo->prepare("INSERT INTO release (title, artist, year, image, played, lastPlayedAt) VALUES (:title, :artist, :year, :image, :played, :lastPlayedAt)");
+        $stmt->execute([
+            ':title' => $release->basic_information->title,
+            ':artist' => $release->basic_information->artists[0]->name,
+            ':year' => $release->basic_information->year,
+            ':image' => './cache/'.$masterStub.'-'.$img,
+            ':played' => 1,
+            ':lastPlayedAt' => date('Y-m-d H:i:s')
+        ]);
     }
 ?>
 
@@ -231,7 +308,8 @@
     </div>
     <div class="below-text">
         <p><a class="refresh" href="#" id="reloadLink" aria-haspopup="true" aria-expanded="false">Next selection</a></p>
-        <small>Built by <a href="https://neilthompson.me">Neil Thompson</a>.</small></div>
+        <small>Built by <a href="https://neilthompson.me">Neil Thompson</a>. <a href="stats.php">#</a></small>
+    </div>
 
         <script>
         // Show the spinner

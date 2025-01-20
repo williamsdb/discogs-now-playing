@@ -5,3 +5,4 @@ src/.DS_Store
 src/config.php
 vinyl_PNG28_transparent.png
 vinyl_PNG28.png
+src/cache.sqlite
